@@ -82,6 +82,9 @@ export default function ReportsDashboardPage() {
     } else if (tab === "Overview") {
       router.push("/dashboard");
     }
+    else if(tab==="Risk Signals"){
+     router.push("/risk-signals");
+    }
   };
 
   return (
