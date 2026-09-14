@@ -7,6 +7,26 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  EDUCATOR
+  STUDENT
+  ADMIN
+}
+
+model users {
+  user_id       Int        @id @default(autoincrement())
+  email         String     @unique @db.VarChar(255)
+  password_hash String     @db.VarChar(255)
+  full_name     String     @db.VarChar(100)
+  role          Role       @default(EDUCATOR)
+  is_active     Boolean    @default(true)
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime   @default(now()) @db.Timestamptz(6)
+
+  educator_profile educators?
+  student_profile  students?
+}
+
 model batches {
   batch_id   Int        @id @default(autoincrement())
   batch_name String     @unique @db.VarChar(150)
@@ -17,10 +37,12 @@ model batches {
 
 model educators {
   educator_id Int      @id @default(autoincrement())
+  user_id     Int?     @unique
   full_name   String   @db.VarChar(100)
   email       String   @unique @db.VarChar(255)
   created_at  DateTime @default(now()) @db.Timestamptz(6)
   nudges      nudges[]
+  users       users?   @relation(fields: [user_id], references: [user_id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -86,6 +108,7 @@ model student_activities {
 
 model students {
   student_id         Int                  @id @default(autoincrement())
+  user_id            Int?                 @unique
   batch_id           Int
   full_name          String               @db.VarChar(100)
   email              String               @unique @db.VarChar(255)
@@ -98,6 +121,7 @@ model students {
   quiz_attempts      quiz_attempts[]
   student_activities student_activities[]
   batches            batches              @relation(fields: [batch_id], references: [batch_id], onDelete: NoAction, onUpdate: NoAction)
+  users              users?               @relation(fields: [user_id], references: [user_id], onDelete: SetNull, onUpdate: Cascade)
 
   @@index([batch_id], map: "idx_students_batch")
 }
