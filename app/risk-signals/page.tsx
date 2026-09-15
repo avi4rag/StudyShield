@@ -81,6 +81,8 @@ export default function RiskSignalsPage() {
     if (tab === "Overview") window.location.href = "/dashboard";
     if (tab === "Students") window.location.href = "/students";
     if (tab === "Messages" || tab === "Messages & Outreach") window.location.href = "/messages";
+    if (tab === "Reports") window.location.href = "/reports";
+
   };
 
   const filteredStudents = useMemo(() => {
