@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth/user';
 
 // Map DB message_type → UI type label
 function mapType(dbType: string): string {
@@ -42,6 +43,7 @@ function formatDate(d: Date | null): string | null {
 
 export async function GET(request: Request) {
   try {
+    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { searchParams } = new URL(request.url);
     const studentIdParam = searchParams.get('studentId');
 
@@ -139,6 +141,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const user = await getAuthenticatedUser(request);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const body = await request.json();
     const {
       studentId,
@@ -175,8 +179,7 @@ export async function POST(request: Request) {
     };
     const dbType = typeMap[type ?? 'Check-in'] ?? 'check_in';
 
-    // Look up educator by a default (seed educator id = 1)
-    const educator = await prisma.educators.findFirst();
+    const educator = await prisma.educators.findFirst({ where: { user_id: user.userId } });
 
     const isScheduled = !!scheduledFor;
     const now = new Date();

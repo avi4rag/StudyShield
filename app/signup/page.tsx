@@ -3,5 +3,5 @@
 import LoginForm from "@/components/auth/LoginForm";
 
 export default function SignupPage() {
-  return <LoginForm />;
+  return <LoginForm mode="signup" />;
 }

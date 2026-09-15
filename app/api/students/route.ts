@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth/user';
 
 // Risk formula: R(t) = min(100, 0.6 * (100 - Q) + 0.4 * L)
 // where L = min(100, inactiveDays * 25), Q = quizCompletionRate (0-100)
@@ -70,8 +71,9 @@ function formatLastActive(lastLoginAt: Date | null): string {
   return `${days} days ago`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     // Fetch all students with their batch and quiz data
     const students = await prisma.students.findMany({
       include: {
@@ -171,6 +173,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const body = await request.json();
     const { name, email, batchName, notes } = body as {
       name: string;

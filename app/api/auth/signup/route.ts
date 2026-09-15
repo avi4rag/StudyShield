@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth/password';
+import { Prisma } from '@/generated/prisma/client';
 
 export async function POST(request: Request) {
   try {
@@ -20,6 +21,9 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ user: { userId: user.user_id, email: user.email, name: user.full_name, role: user.role } }, { status: 201 });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: 'An account with that email already exists.' }, { status: 409 });
+    }
     console.error('[POST /api/auth/signup]', error);
     return NextResponse.json({ error: 'Unable to create account.' }, { status: 500 });
   }

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth/user';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const students = await prisma.students.findMany({
       include: {
         quiz_attempts: true,

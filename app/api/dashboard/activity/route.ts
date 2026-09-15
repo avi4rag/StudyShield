@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth/user';
 
 function timeAgo(date: Date): string {
   const diff = Date.now() - new Date(date).getTime();
@@ -33,8 +34,9 @@ function activityLabel(type: string): string {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const activities = await prisma.student_activities.findMany({
       orderBy: { occurred_at: 'desc' },
       take: 5,

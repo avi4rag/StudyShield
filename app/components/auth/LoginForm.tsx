@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 
-export default function LoginForm() {
+export default function LoginForm({ mode = 'login' }) {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -14,6 +14,8 @@ export default function LoginForm() {
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [fullName, setFullName] = useState('');
+  const isSignup = mode === 'signup';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -21,21 +23,16 @@ export default function LoginForm() {
     }
   }, [isAuthenticated, router]);
 
-  // Valid credentials mapping
-  const VALID_CREDENTIALS = [
-    { email: 'anurag@institution.edu', password: 'password123', name: 'Anurag' },
-    { email: 'anurag@institution.edu', password: 'password', name: 'Anurag' },
-    { email: 'anurag@institution.edu', password: 'admin', name: 'Anurag' },
-    { email: 'educator@studyshield.com', password: 'password123', name: 'Educator' },
-    { email: 'admin@studyshield.com', password: 'password123', name: 'Administrator' }
-  ];
-
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     if (event && event.preventDefault) {
       event.preventDefault();
     }
     setErrorMessage('');
 
+    if (isSignup && !fullName.trim()) {
+      setErrorMessage('Please enter your full name.');
+      return;
+    }
     if (!email.trim()) {
       setErrorMessage('Please enter your work email.');
       return;
@@ -46,40 +43,30 @@ export default function LoginForm() {
     }
 
     setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-
-      const trimmedEmail = email.trim().toLowerCase();
-      
-      // Check for matching credentials
-      const matched = VALID_CREDENTIALS.find(
-        (c) => c.email.toLowerCase() === trimmedEmail && c.password === password
-      );
-
-      // Also accept any valid .edu email with standard password123 or password
-      const isEduMatch = trimmedEmail.endsWith('.edu') && (password === 'password123' || password === 'password' || password.length >= 6);
-
-      if (matched || isEduMatch) {
-        const derivedName = matched ? matched.name : (trimmedEmail.split('@')[0].split('.')[0] || 'Anurag');
-        const formattedName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1);
-
-        login({
-          name: formattedName || 'Anurag',
-          email: trimmedEmail,
-          role: 'Lead Educator'
-        });
-      } else {
-        setErrorMessage('Invalid email or password. Hint: Use anurag@institution.edu with password123');
-      }
-    }, 450);
+    const response = await fetch(`/api/auth/${isSignup ? 'signup' : 'login'}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName, email, password, role: 'EDUCATOR' }),
+    });
+    const data = await response.json().catch(() => ({}));
+    setIsLoading(false);
+    if (!response.ok) {
+      setErrorMessage(data.error ?? 'Unable to complete authentication.');
+      return;
+    }
+    if (isSignup) {
+      const loginResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const loginData = await loginResponse.json();
+      if (!loginResponse.ok) { setErrorMessage(loginData.error ?? 'Account created. Please sign in.'); return; }
+      login(loginData.user);
+    } else {
+      login(data.user);
+    }
   }
-
-  const fillDemoCredentials = () => {
-    setEmail('anurag@institution.edu');
-    setPassword('password123');
-    setErrorMessage('');
-  };
 
   return (
     <main className="login-shell">
@@ -150,26 +137,20 @@ export default function LoginForm() {
             <span className="brand-name">StudyShield</span>
           </div>
           <div className="form-heading">
-            <p className="form-kicker">Welcome back</p>
-            <h2>Sign in to your workspace</h2>
-            <p>Access your learner insights and support queue.</p>
+            <p className="form-kicker">{isSignup ? 'Get started' : 'Welcome back'}</p>
+            <h2>{isSignup ? 'Create your workspace account' : 'Sign in to your workspace'}</h2>
+            <p>{isSignup ? 'Set up your educator account to begin.' : 'Access your learner insights and support queue.'}</p>
           </div>
 
           {/* Error message banner */}
           {errorMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center justify-between">
+            <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
               <span>{errorMessage}</span>
-              <button 
-                type="button" 
-                onClick={fillDemoCredentials}
-                className="underline hover:text-rose-900 ml-2 shrink-0"
-              >
-                Auto-fill
-              </button>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="login-form-element">
+            {isSignup && <><label htmlFor="fullName">Full name</label><div className="input-wrap"><input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required /></div></>}
             <label htmlFor="email">Work email</label>
             <div className="input-wrap">
               <span className="input-icon">@</span>
@@ -236,44 +217,15 @@ export default function LoginForm() {
               type="submit"
               disabled={isLoading}
             >
-              <span>{isLoading ? "Validating credentials..." : "Sign in"}</span> 
+              <span>{isLoading ? "Please wait..." : isSignup ? "Create account" : "Sign in"}</span>
               <span>{"->"}</span>
             </button>
           </form>
 
           {/* Credentials helper pill */}
-          <div className="mt-3 p-2.5 rounded-lg bg-emerald-50/80 border border-emerald-200/60 text-[11px] text-emerald-800 flex items-center justify-between">
-            <div>
-              <strong>Demo Login:</strong> <span className="font-mono">anurag@institution.edu</span> / <span className="font-mono">password123</span>
-            </div>
-            <button
-              type="button"
-              onClick={fillDemoCredentials}
-              className="text-emerald-700 font-bold hover:underline ml-2 shrink-0"
-            >
-              Fill
-            </button>
-          </div>
-
-          <div className="divider">
-            <span>or continue with</span>
-          </div>
-          <button 
-            className="sso-button" 
-            type="button"
-            onClick={() => {
-              fillDemoCredentials();
-              login({
-                name: 'Anurag',
-                email: 'anurag@institution.edu',
-                role: 'Lead Educator'
-              });
-            }}
-          >
-            <span className="sso-icon">G</span> Continue with Google
-          </button>
           <p className="form-note">
-            New to StudyShield? <a href="#request-access" onClick={(e) => { e.preventDefault(); fillDemoCredentials(); }}>Request access</a>
+            {isSignup ? 'Already have an account? ' : 'New to StudyShield? '}
+            <a href={isSignup ? '/login' : '/signup'}>{isSignup ? 'Sign in' : 'Create an account'}</a>
           </p>
           <p className="secure-note">
             <span className="shield-icon">+</span> Your workspace is protected
