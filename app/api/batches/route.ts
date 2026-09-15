@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth/user';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const batches = await prisma.batches.findMany({
       orderBy: { batch_name: 'asc' },
       select: { batch_id: true, batch_name: true },

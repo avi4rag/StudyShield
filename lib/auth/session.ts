@@ -15,6 +15,8 @@ export interface UserSessionPayload {
   name: string;
 }
 
+const VALID_ROLES = new Set<UserSessionPayload['role']>(['EDUCATOR', 'STUDENT', 'ADMIN']);
+
 /**
  * Creates a signed JWT session token with explicit issued-at (iat) and expiration (exp) claims.
  */
@@ -51,10 +53,11 @@ export async function verifySessionToken(token: string): Promise<UserSessionPayl
       typeof payload.role === 'string' &&
       typeof payload.name === 'string'
     ) {
+      if (!VALID_ROLES.has(payload.role as UserSessionPayload['role'])) return null;
       return {
         userId: payload.userId,
         email: payload.email,
-        role: payload.role as 'EDUCATOR' | 'STUDENT' | 'ADMIN',
+        role: payload.role as UserSessionPayload['role'],
         name: payload.name,
       };
     }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/auth/user';
 
 function formatLastActive(lastLoginAt: Date | null): string {
   if (!lastLoginAt) return 'Unknown';
@@ -17,6 +18,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    if (!await getAuthenticatedUser(_request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { id } = await params;
     const studentId = parseInt(id, 10);
 

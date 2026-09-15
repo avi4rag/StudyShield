@@ -20,6 +20,9 @@ export function getJwtSecretKey(): Uint8Array {
     // Safe development fallback
     return new TextEncoder().encode('studyshield_dev_jwt_secret_key_minimum_32_chars!');
   }
+  if (process.env.NODE_ENV === 'production' && secret.length < 32) {
+    throw new Error('FATAL: JWT_SECRET must be at least 32 characters in production.');
+  }
   return new TextEncoder().encode(secret);
 }
 
