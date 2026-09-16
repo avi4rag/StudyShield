@@ -73,7 +73,11 @@ function formatLastActive(lastLoginAt: Date | null): string {
 
 export async function GET(request: Request) {
   try {
-    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthenticatedUser(request);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'EDUCATOR' && user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     // Fetch all students with their batch and quiz data
     const students = await prisma.students.findMany({
       include: {
@@ -173,7 +177,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    if (!await getAuthenticatedUser(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const user = await getAuthenticatedUser(request);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'EDUCATOR' && user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const body = await request.json();
     const { name, email, batchName, notes } = body as {
       name: string;

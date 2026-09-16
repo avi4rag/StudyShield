@@ -68,3 +68,8 @@ export function invalidateCache(pattern?: string | RegExp): void {
     }
   }
 }
+
+export function clearCache(): void {
+  memoryCache.clear();
+  inflightRequests.clear();
+}
