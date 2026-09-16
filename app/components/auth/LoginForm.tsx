@@ -24,6 +24,20 @@ export default function LoginForm({ mode = 'login' }) {
     }
   }, [isAuthenticated, router]);
 
+  useEffect(() => {
+    const error = new URLSearchParams(window.location.search).get('error');
+    if (!error) return;
+
+    const messages = {
+      AccessDenied: 'Google sign-in was cancelled or denied.',
+      Configuration: 'Google sign-in is not configured yet. Please try again later.',
+      OAuthSignin: 'Unable to start Google sign-in. Please try again.',
+      OAuthCallback: 'Google sign-in could not be completed. Please try again.',
+      OAuthAccountNotLinked: 'This Google account is not linked to an existing account.',
+    };
+    setErrorMessage(messages[error] ?? 'Unable to complete Google sign-in. Please try again.');
+  }, []);
+
   async function handleSubmit(event) {
     if (event && event.preventDefault) {
       event.preventDefault();
