@@ -19,7 +19,9 @@ export default function GoogleSignIn() {
       onClick={handleSignIn}
       disabled={isLoading}
     >
-      <span className="google-mark" aria-hidden="true">G</span>
+      <span className="google-mark" aria-hidden="true">
+        G
+      </span>
       <span>{isLoading ? "Connecting..." : "Continue with Google"}</span>
     </button>
   );

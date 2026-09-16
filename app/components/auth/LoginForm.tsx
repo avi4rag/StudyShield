@@ -1,82 +1,89 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/components/auth/AuthContext';
-import { useRouter } from 'next/navigation';
-import GoogleSignIn from './GoogleSignIn';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/components/auth/AuthContext";
+import { useRouter } from "next/navigation";
+import GoogleSignIn from "./GoogleSignIn";
 
-export default function LoginForm({ mode = 'login' }) {
+export default function LoginForm({ mode = "login" }) {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [fullName, setFullName] = useState('');
-  const isSignup = mode === 'signup';
+  const [errorMessage, setErrorMessage] = useState("");
+  const [fullName, setFullName] = useState("");
+  const isSignup = mode === "signup";
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/dashboard');
+      router.replace("/dashboard");
     }
   }, [isAuthenticated, router]);
 
   useEffect(() => {
-    const error = new URLSearchParams(window.location.search).get('error');
+    const error = new URLSearchParams(window.location.search).get("error");
     if (!error) return;
 
     const messages = {
-      AccessDenied: 'Google sign-in was cancelled or denied.',
-      Configuration: 'Google sign-in is not configured yet. Please try again later.',
-      OAuthSignin: 'Unable to start Google sign-in. Please try again.',
-      OAuthCallback: 'Google sign-in could not be completed. Please try again.',
-      OAuthAccountNotLinked: 'This Google account is not linked to an existing account.',
+      AccessDenied: "Google sign-in was cancelled or denied.",
+      Configuration:
+        "Google sign-in is not configured yet. Please try again later.",
+      OAuthSignin: "Unable to start Google sign-in. Please try again.",
+      OAuthCallback: "Google sign-in could not be completed. Please try again.",
+      OAuthAccountNotLinked:
+        "This Google account is not linked to an existing account.",
     };
-    setErrorMessage(messages[error] ?? 'Unable to complete Google sign-in. Please try again.');
+    setErrorMessage(
+      messages[error] ?? "Unable to complete Google sign-in. Please try again.",
+    );
   }, []);
 
   async function handleSubmit(event) {
     if (event && event.preventDefault) {
       event.preventDefault();
     }
-    setErrorMessage('');
+    setErrorMessage("");
 
     if (isSignup && !fullName.trim()) {
-      setErrorMessage('Please enter your full name.');
+      setErrorMessage("Please enter your full name.");
       return;
     }
     if (!email.trim()) {
-      setErrorMessage('Please enter your work email.');
+      setErrorMessage("Please enter your work email.");
       return;
     }
     if (!password) {
-      setErrorMessage('Please enter your password.');
+      setErrorMessage("Please enter your password.");
       return;
     }
 
     setIsLoading(true);
-    const response = await fetch(`/api/auth/${isSignup ? 'signup' : 'login'}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullName, email, password, role: 'EDUCATOR' }),
+    const response = await fetch(`/api/auth/${isSignup ? "signup" : "login"}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email, password, role: "EDUCATOR" }),
     });
     const data = await response.json().catch(() => ({}));
     setIsLoading(false);
     if (!response.ok) {
-      setErrorMessage(data.error ?? 'Unable to complete authentication.');
+      setErrorMessage(data.error ?? "Unable to complete authentication.");
       return;
     }
     if (isSignup) {
-      const loginResponse = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const loginResponse = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const loginData = await loginResponse.json();
-      if (!loginResponse.ok) { setErrorMessage(loginData.error ?? 'Account created. Please sign in.'); return; }
+      if (!loginResponse.ok) {
+        setErrorMessage(loginData.error ?? "Account created. Please sign in.");
+        return;
+      }
       login(loginData.user);
     } else {
       login(data.user);
@@ -86,7 +93,7 @@ export default function LoginForm({ mode = 'login' }) {
   return (
     <main className="login-shell">
       <div className="ambient-grid" aria-hidden="true" />
-      
+
       {/* Left Brand Panel */}
       <section className="brand-panel">
         <header className="brand-header">
@@ -152,9 +159,19 @@ export default function LoginForm({ mode = 'login' }) {
             <span className="brand-name">StudyShield</span>
           </div>
           <div className="form-heading">
-            <p className="form-kicker">{isSignup ? 'Get started' : 'Welcome back'}</p>
-            <h2>{isSignup ? 'Create your workspace account' : 'Sign in to your workspace'}</h2>
-            <p>{isSignup ? 'Set up your educator account to begin.' : 'Access your learner insights and support queue.'}</p>
+            <p className="form-kicker">
+              {isSignup ? "Get started" : "Welcome back"}
+            </p>
+            <h2>
+              {isSignup
+                ? "Create your workspace account"
+                : "Sign in to your workspace"}
+            </h2>
+            <p>
+              {isSignup
+                ? "Set up your educator account to begin."
+                : "Access your learner insights and support queue."}
+            </p>
           </div>
 
           {/* Error message banner */}
@@ -165,7 +182,20 @@ export default function LoginForm({ mode = 'login' }) {
           )}
 
           <form onSubmit={handleSubmit} className="login-form-element">
-            {isSignup && <><label htmlFor="fullName">Full name</label><div className="input-wrap"><input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required /></div></>}
+            {isSignup && (
+              <>
+                <label htmlFor="fullName">Full name</label>
+                <div className="input-wrap">
+                  <input
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    autoComplete="name"
+                    required
+                  />
+                </div>
+              </>
+            )}
             <label htmlFor="email">Work email</label>
             <div className="input-wrap">
               <span className="input-icon">@</span>
@@ -176,7 +206,7 @@ export default function LoginForm({ mode = 'login' }) {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (errorMessage) setErrorMessage('');
+                  if (errorMessage) setErrorMessage("");
                 }}
                 placeholder="you@institution.edu"
                 autoComplete="email"
@@ -186,7 +216,9 @@ export default function LoginForm({ mode = 'login' }) {
 
             <div className="label-row">
               <label htmlFor="password">Password</label>
-              <a href="#forgot" onClick={(e) => e.preventDefault()}>Forgot password?</a>
+              <a href="#forgot" onClick={(e) => e.preventDefault()}>
+                Forgot password?
+              </a>
             </div>
             <div className="input-wrap">
               <span className="input-icon lock-icon">*</span>
@@ -197,7 +229,7 @@ export default function LoginForm({ mode = 'login' }) {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (errorMessage) setErrorMessage('');
+                  if (errorMessage) setErrorMessage("");
                 }}
                 placeholder="Enter your password"
                 autoComplete="current-password"
@@ -226,28 +258,38 @@ export default function LoginForm({ mode = 'login' }) {
               <span className="custom-checkbox" />
               Keep me signed in
             </label>
-            
-            <button 
-              className="submit-button" 
+
+            <button
+              className="submit-button"
               type="submit"
               disabled={isLoading}
             >
-              <span>{isLoading ? "Please wait..." : isSignup ? "Create account" : "Sign in"}</span>
+              <span>
+                {isLoading
+                  ? "Please wait..."
+                  : isSignup
+                    ? "Create account"
+                    : "Sign in"}
+              </span>
               <span>{"->"}</span>
             </button>
           </form>
 
           {!isSignup && (
             <>
-              <div className="auth-divider"><span>or</span></div>
+              <div className="auth-divider">
+                <span>or</span>
+              </div>
               <GoogleSignIn />
             </>
           )}
 
           {/* Credentials helper pill */}
           <p className="form-note">
-            {isSignup ? 'Already have an account? ' : 'New to StudyShield? '}
-            <a href={isSignup ? '/login' : '/signup'}>{isSignup ? 'Sign in' : 'Create an account'}</a>
+            {isSignup ? "Already have an account? " : "New to StudyShield? "}
+            <a href={isSignup ? "/login" : "/signup"}>
+              {isSignup ? "Sign in" : "Create an account"}
+            </a>
           </p>
           <p className="secure-note">
             <span className="shield-icon">+</span> Your workspace is protected
