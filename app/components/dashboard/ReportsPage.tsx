@@ -16,11 +16,11 @@ interface BatchMetric {
 }
 
 interface Student {
-  id: number;
+  id: string;
   name: string;
   email: string;
   batch: string;
-  quizCompletion: number;
+  quizCompletionRate: number;
   inactiveDays: number;
   riskScore: number;
   riskLevel: string;
@@ -55,13 +55,13 @@ export default function ReportsPage({
 
   const metrics = useMemo(() => {
     const total = batchStudents.length;
-    const highRisk = batchStudents.filter(s => s.riskScore > 75).length;
-    const mediumRisk = batchStudents.filter(s => s.riskScore >= 45 && s.riskScore <= 75).length;
-    const lowRisk = batchStudents.filter(s => s.riskScore < 45).length;
+    const highRisk = batchStudents.filter(s => s.riskScore >= 70).length;
+    const mediumRisk = batchStudents.filter(s => s.riskScore >= 40 && s.riskScore < 70).length;
+    const lowRisk = batchStudents.filter(s => s.riskScore < 40).length;
 
     // Calculate percentages for health metrics
     const quizCompletionRate = total > 0
-      ? Math.round(batchStudents.reduce((sum, s) => sum + s.quizCompletion, 0) / total)
+      ? Math.round(batchStudents.reduce((sum, s) => sum + (Number.isFinite(s.quizCompletionRate) ? s.quizCompletionRate : 0), 0) / total)
       : 0;
 
     const avgInactiveDays = total > 0
@@ -244,7 +244,7 @@ export default function ReportsPage({
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-emerald-700 flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Low Risk (Score &lt; 45)
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Healthy (Score &lt; 40)
                   </span>
                   <span className="text-slate-700">{metrics.lowRisk} Students ({batchStudents.length > 0 ? Math.round((metrics.lowRisk / batchStudents.length) * 100) : 0}%)</span>
                 </div>
@@ -259,7 +259,7 @@ export default function ReportsPage({
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-amber-700 flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Medium Risk (Score 45 - 75)
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Medium Risk (Score 40 - 69)
                   </span>
                   <span className="text-slate-700">{metrics.mediumRisk} Students ({batchStudents.length > 0 ? Math.round((metrics.mediumRisk / batchStudents.length) * 100) : 0}%)</span>
                 </div>
@@ -274,7 +274,7 @@ export default function ReportsPage({
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-rose-700 flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span> High Risk (Score &gt; 75)
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span> High Risk (Score 70 - 100)
                   </span>
                   <span className="text-slate-700">{metrics.highRisk} Students ({batchStudents.length > 0 ? Math.round((metrics.highRisk / batchStudents.length) * 100) : 0}%)</span>
                 </div>

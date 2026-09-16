@@ -20,6 +20,10 @@ const lastNames = [
   "Reddy", "Iyer",
 ];
 
+const STUDENT_COUNT = 200;
+const HEALTHY_COUNT = 120; // 60%
+const MEDIUM_COUNT = 42; // 21%; the remaining 38 (19%) are high risk
+
 async function getOrCreateBatch(batchName) {
   const rows = await prisma.$queryRaw`
     INSERT INTO batches (batch_name)
@@ -96,15 +100,20 @@ async function main() {
   }
 
   const students = [];
-  for (let index = 1; index <= 100; index += 1) {
+  const seededAt = Date.now();
+  for (let index = 1; index <= STUDENT_COUNT; index += 1) {
     const firstName = firstNames[(index - 1) % firstNames.length];
     const lastName = lastNames[Math.floor((index - 1) / firstNames.length) % lastNames.length];
     const fullName = `${firstName} ${lastName}`;
     const email = `test.student${String(index).padStart(3, "0")}@studyshield.example`;
     const initials = `${firstName[0]}${lastName[0]}`;
     const batchId = batchIds[(index - 1) % batchIds.length];
-    const inactiveDays = index % 12;
-    const lastLoginAt = new Date(Date.now() - inactiveDays * 24 * 60 * 60 * 1000);
+    // The student API scores completed quizzes and days since login.
+    // These profiles yield exactly 120 healthy, 42 medium, and 38 high risk students.
+    const isHealthy = index <= HEALTHY_COUNT;
+    const isMedium = index > HEALTHY_COUNT && index <= HEALTHY_COUNT + MEDIUM_COUNT;
+    const inactiveDays = isHealthy ? (index % 3) : isMedium ? 4 + (index % 3) : 3 + (index % 6);
+    const lastLoginAt = new Date(seededAt - inactiveDays * 24 * 60 * 60 * 1000);
 
     const rows = await prisma.$queryRaw`
       INSERT INTO students (batch_id, full_name, email, avatar_initials, last_login_at, notes)
@@ -123,7 +132,7 @@ async function main() {
     const studentId = rows[0].student_id;
     students.push({ studentId, batchId, fullName, email, inactiveDays });
 
-    // Add one login activity if the test student does not already have one.
+    // Keep the login activity consistent when the seed is run again.
     const activityExists = await prisma.$queryRaw`
       SELECT activity_id
       FROM student_activities
@@ -135,12 +144,18 @@ async function main() {
         INSERT INTO student_activities (student_id, activity_type, occurred_at)
         VALUES (${studentId}, ${"login"}, ${lastLoginAt})
       `;
+    } else {
+      await prisma.$executeRaw`
+        UPDATE student_activities
+        SET occurred_at = ${lastLoginAt}
+        WHERE activity_id = ${activityExists[0].activity_id}
+      `;
     }
 
     // Create/update one attempt, so the risk calculation has quiz data.
     const [quizOne, quizTwo] = quizIdsByBatch.get(batchId);
     const quizId = index % 2 === 0 ? quizOne : quizTwo;
-    const isCompleted = index % 3 !== 0;
+    const isCompleted = isHealthy || isMedium;
     const status = isCompleted ? "completed" : "missed";
     const score = isCompleted ? 50 + (index % 45) : null;
     const submittedAt = isCompleted ? lastLoginAt : null;
@@ -187,9 +202,9 @@ async function main() {
   console.log("Seed complete:");
   console.log("- 15 test batches");
   console.log("- 4 test educators");
-  console.log("- 100 test students");
+  console.log("- 200 test students (120 healthy, 42 medium risk, 38 high risk)");
   console.log("- 30 test quizzes");
-  console.log("- 100 quiz attempts and login activities");
+  console.log("- 200 quiz attempts and login activities");
   console.log("- 30 test nudges");
 }
 

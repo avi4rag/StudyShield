@@ -10,11 +10,11 @@ import { cachedFetch, invalidateCache } from "@/lib/cache";
 import { CheckCircle2 } from "lucide-react";
 
 interface Student {
-  id: number;
+  id: string;
   name: string;
   email: string;
   batch: string;
-  quizCompletion: number;
+  quizCompletionRate: number;
   inactiveDays: number;
   riskScore: number;
   riskLevel: string;
