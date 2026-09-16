@@ -34,7 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${dmSans.variable} ${plusJakartaSans.variable} ${manrope.variable}`}>
-      <body className={`${dmSans.className} antialiased font-sans`}>
+      <body
+        className={`${dmSans.className} antialiased font-sans`}
+        suppressHydrationWarning
+      >
         <SessionProvider>
           <AuthProvider>{children}</AuthProvider>
         </SessionProvider>
