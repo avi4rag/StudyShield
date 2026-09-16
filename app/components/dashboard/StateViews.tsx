@@ -55,17 +55,19 @@ export function LoadingState() {
   );
 }
 
-export function EmptyState({ onRefresh }) {
+export function EmptyState({ onRefresh, noStudents = false }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 p-12 text-center my-6 max-w-2xl mx-auto shadow-xs">
       <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mx-auto mb-4">
         <ShieldCheck className="w-8 h-8" />
       </div>
       <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-        You&apos;re all caught up
+        {noStudents ? 'No students found' : "You're all caught up"}
       </h2>
       <p className="text-sm text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
-        No students currently require urgent attention. All learners in this cohort are active, submitting quizzes on schedule, and maintaining healthy retention momentum.
+        {noStudents
+          ? 'There are no student records available for this educator yet.'
+          : 'No students currently require urgent attention. All learners in this cohort are active, submitting quizzes on schedule, and maintaining healthy retention momentum.'}
       </p>
       <div className="mt-6 flex items-center justify-center gap-3">
         <button

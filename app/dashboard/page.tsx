@@ -59,6 +59,7 @@ export default function DashboardPage() {
   // Fetch all data from the API
   const fetchAll = useCallback(async (force = false) => {
     setIsDataLoading(true);
+    setViewState("loading");
     if (force) {
       invalidateCache("/api/students");
       invalidateCache("/api/dashboard");
@@ -72,8 +73,10 @@ export default function DashboardPage() {
       if (studentsData) setStudents(studentsData);
       if (signalsData) setSignals(signalsData);
       if (activityData) setActivities(activityData);
+      setViewState(studentsData.length === 0 ? "empty" : "normal");
     } catch (err) {
       console.error("Dashboard fetch error:", err);
+      setViewState("error");
     } finally {
       setIsDataLoading(false);
     }

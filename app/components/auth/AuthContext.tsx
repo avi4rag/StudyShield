@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut as authSignOut, useSession } from 'next-auth/react';
-
+import { clearCache } from '@/lib/cache';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -26,6 +26,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (authSession?.user) {
+      clearCache();
       setUser(authSession.user);
       setIsLoading(false);
     }
@@ -41,6 +42,7 @@ export function AuthProvider({ children }) {
     if (authSession?.user) {
       await authSignOut({ redirect: false });
     }
+    clearCache();
     setUser(null);
     router.push('/login');
   };
