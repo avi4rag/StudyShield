@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useRouter } from 'next/navigation';
+import GoogleSignIn from './GoogleSignIn';
 
 export default function LoginForm({ mode = 'login' }) {
   const { login, isAuthenticated } = useAuth();
@@ -221,6 +222,13 @@ export default function LoginForm({ mode = 'login' }) {
               <span>{"->"}</span>
             </button>
           </form>
+
+          {!isSignup && (
+            <>
+              <div className="auth-divider"><span>or</span></div>
+              <GoogleSignIn />
+            </>
+          )}
 
           {/* Credentials helper pill */}
           <p className="form-note">
