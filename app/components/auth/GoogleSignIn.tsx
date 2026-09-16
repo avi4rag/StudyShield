@@ -8,7 +8,7 @@ export default function GoogleSignIn() {
 
   async function handleSignIn() {
     setIsLoading(true);
-    await signIn("google", { callbackUrl: "/student/dashboard" });
+    await signIn("google", { callbackUrl: "/dashboard" });
     setIsLoading(false);
   }
 
