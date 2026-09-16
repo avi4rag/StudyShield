@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Plus_Jakarta_Sans, Manrope } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import "./globals.css";
 
@@ -34,9 +35,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} ${plusJakartaSans.variable} ${manrope.variable}`}>
       <body className={`${dmSans.className} antialiased font-sans`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <SessionProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );
