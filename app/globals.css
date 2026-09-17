@@ -584,12 +584,14 @@
   justify-content: center;
   padding: 14px;
   transition:
-    background 0.2s,
-    transform 0.2s;
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
-.submit-button:hover {
+.submit-button:hover:not(:disabled) {
   background: #0da873;
-  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(18, 185, 130, 0.3);
+  transform: translateY(-2px);
 }
 .submit-button span {
   font-size: 17px;
