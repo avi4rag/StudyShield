@@ -2,9 +2,11 @@ import 'server-only';
 
 import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
+import { getAuthRuntimeConfig } from './runtime-config';
 import { getSessionTokenFromRequest, verifySessionToken, type UserSessionPayload } from './session';
 
 export async function getAuthenticatedUser(request: Request): Promise<UserSessionPayload | null> {
+  getAuthRuntimeConfig();
   const token = getSessionTokenFromRequest(request);
   const legacySession = token ? await verifySessionToken(token) : null;
   const authSession = legacySession ? null : await auth();

@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut as authSignOut, useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { clearCache } from '@/lib/cache';
+import { signOutEverywhere } from './signOutEverywhere';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -38,11 +39,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => undefined);
-    if (authSession?.user) {
-      await authSignOut({ redirect: false });
-    }
-    clearCache();
+    await signOutEverywhere();
     setUser(null);
     router.push('/login');
   };
