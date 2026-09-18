@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   TrendingUp, TrendingDown, Activity, BookOpen, Clock, Award,
-  BarChart2, PieChart, ShieldAlert, ChevronRight, Calendar, Filter, Download
+  Calendar, Filter, Download
 } from 'lucide-react';
 
 interface BatchMetric {
@@ -224,10 +224,10 @@ export default function ReportsPage({
         </div>
       </div>
 
-      {/* Mid Section: Risk Distribution & Predictive Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Risk Distribution */}
+      <div>
         {/* Risk Distribution Breakdown */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs lg:col-span-2 flex flex-col justify-between">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -288,52 +288,6 @@ export default function ReportsPage({
             </div>
           </div>
 
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-emerald-600 text-white rounded-lg">
-                <ShieldAlert className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900">Actionable Insight</h4>
-                <p className="text-[11px] text-slate-500">
-                  {metrics.highRisk} high-risk students require immediate intervention via nudges or quizzes.
-                </p>
-              </div>
-            </div>
-            <button className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 shrink-0">
-              View Queue <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Cohort Performance Summary Card */}
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="bg-emerald-500 text-slate-900 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                Analytics Intelligence
-              </span>
-            </div>
-            <h3 className="text-lg font-bold">Retention & Drop-off Trend</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Students who become inactive for more than <strong className="text-emerald-400">7 days</strong> show the strongest correlation with rising risk scores. Early nudges sent within 48 hours reduced drop-off by <strong className="text-emerald-400">64%</strong>.
-            </p>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-slate-700/80 space-y-3">
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-400">Model Accuracy</span>
-              <span className="font-bold text-emerald-400">94.8%</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-400">Active Monitoring</span>
-              <span className="font-bold text-white">{batchStudents.length} Students</span>
-            </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-400">Last Weight Recalculation</span>
-              <span className="font-bold text-slate-300">Today, 02:30 PM</span>
-            </div>
-          </div>
         </div>
       </div>
 
