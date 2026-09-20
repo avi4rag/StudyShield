@@ -28,10 +28,6 @@ const StudentDetailDrawer = dynamic(
   () => import("@/components/modals/StudentDetailDrawer"),
   { ssr: false },
 );
-const AddStudentModal = dynamic(
-  () => import("@/components/modals/AddStudentModal"),
-  { ssr: false },
-);
 const ReportModal = dynamic(() => import("@/components/modals/ReportModal"), {
   ssr: false,
 });
@@ -90,7 +86,6 @@ export default function DashboardPage() {
   const [selectedStudentForNudge, setSelectedStudentForNudge] = useState(null);
   const [selectedStudentForDetail, setSelectedStudentForDetail] =
     useState(null);
-  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Active risk filter triggered by metric cards
@@ -149,34 +144,6 @@ export default function DashboardPage() {
     }
     showToast(
       `Nudge sent successfully to ${student ? student.name : "student"}.`,
-    );
-  };
-
-  const handleAddStudent = async (newStudentLocal) => {
-    try {
-      const res = await fetch("/api/students", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: newStudentLocal.name,
-          email: newStudentLocal.email,
-          batchName: newStudentLocal.batch,
-          notes: newStudentLocal.notes ?? null,
-        }),
-      });
-      invalidateCache("/api/students");
-      invalidateCache("/api/dashboard");
-      if (res.ok) {
-        const saved = await res.json();
-        setStudents((prev) => [saved, ...prev]);
-      } else {
-        setStudents((prev) => [newStudentLocal, ...prev]);
-      }
-    } catch {
-      setStudents((prev) => [newStudentLocal, ...prev]);
-    }
-    showToast(
-      `Enrolled ${newStudentLocal.name} into StudyShield retention monitor.`,
     );
   };
 
@@ -370,7 +337,6 @@ export default function DashboardPage() {
 
                   {/* Quick Actions Card */}
                   <QuickActions
-                    onAddStudent={() => setIsAddStudentOpen(true)}
                     onViewAtRisk={() => handleSelectMetricCard("HIGH")}
                     onGenerateReport={() => setIsReportModalOpen(true)}
                     onSendReminder={() => {
@@ -445,12 +411,6 @@ export default function DashboardPage() {
           onClose={() => setSelectedStudentForDetail(null)}
           student={selectedStudentForDetail}
           onOpenNudge={(student) => setSelectedStudentForNudge(student)}
-        />
-
-        <AddStudentModal
-          isOpen={isAddStudentOpen}
-          onClose={() => setIsAddStudentOpen(false)}
-          onAddStudent={handleAddStudent}
         />
 
         <ReportModal
