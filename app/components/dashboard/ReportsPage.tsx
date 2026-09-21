@@ -112,7 +112,7 @@ export default function ReportsPage({
       {/* Sub-header Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Good afternoon, Anurag</h2>
+          <h2 className="text-xl font-bold text-slate-900">Good afternoon</h2>
           <p className="text-xs text-slate-500 mt-0.5">Comprehensive analytics, cohort trajectories, and engagement metrics.</p>
         </div>
 
@@ -147,13 +147,13 @@ export default function ReportsPage({
             </select>
           </div>
 
-          <button
+          {/* <button
             onClick={onExportReport}
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm transition-all cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             Export Report
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -313,7 +313,7 @@ export default function ReportsPage({
                 <th className="py-3 px-4">QUIZ COMPLETION</th>
                 <th className="py-3 px-4">HIGH RISK COUNT</th>
                 <th className="py-3 px-4">HEALTH STATUS</th>
-                <th className="py-3 px-4 text-right">ACTION</th>
+                {/* <th className="py-3 px-4 text-right">ACTION</th> */}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -347,9 +347,9 @@ export default function ReportsPage({
                     </span>
                   </td>
                   <td className="py-3.5 px-4 text-right">
-                    <button className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-all cursor-pointer">
-                      Inspect Batch
-                    </button>
+                    {/* <button className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-all cursor-pointer"> */}
+                      {/* Inspect Batch */}
+                    {/* </button> */}
                   </td>
                 </tr>
               ))}
