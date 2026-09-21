@@ -1,7 +1,5 @@
-"use client";
-
-import LoginForm from "@/components/auth/LoginForm";
+import { redirect } from "next/navigation";
 
 export default function SignupPage() {
-  return <LoginForm mode="signup" />;
+  redirect("/login");
 }

@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { useRouter } from "next/navigation";
 import GoogleSignIn from "./GoogleSignIn";
 
-export default function LoginForm({ mode = "login" }) {
+export default function LoginForm() {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -15,8 +15,6 @@ export default function LoginForm({ mode = "login" }) {
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [fullName, setFullName] = useState("");
-  const isSignup = mode === "signup";
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -48,10 +46,6 @@ export default function LoginForm({ mode = "login" }) {
     }
     setErrorMessage("");
 
-    if (isSignup && !fullName.trim()) {
-      setErrorMessage("Please enter your full name.");
-      return;
-    }
     if (!email.trim()) {
       setErrorMessage("Please enter your work email.");
       return;
@@ -62,10 +56,10 @@ export default function LoginForm({ mode = "login" }) {
     }
 
     setIsLoading(true);
-    const response = await fetch(`/api/auth/${isSignup ? "signup" : "login"}`, {
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fullName, email, password, role: "EDUCATOR" }),
+      body: JSON.stringify({ email, password }),
     });
     const data = await response.json().catch(() => ({}));
     setIsLoading(false);
@@ -73,21 +67,7 @@ export default function LoginForm({ mode = "login" }) {
       setErrorMessage(data.error ?? "Unable to complete authentication.");
       return;
     }
-    if (isSignup) {
-      const loginResponse = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const loginData = await loginResponse.json();
-      if (!loginResponse.ok) {
-        setErrorMessage(loginData.error ?? "Account created. Please sign in.");
-        return;
-      }
-      login(loginData.user);
-    } else {
-      login(data.user);
-    }
+    login(data.user);
   }
 
   return (
@@ -160,17 +140,13 @@ export default function LoginForm({ mode = "login" }) {
           </div>
           <div className="form-heading">
             <p className="form-kicker">
-              {isSignup ? "Get started" : "Welcome back"}
+              Welcome back
             </p>
             <h2>
-              {isSignup
-                ? "Create your workspace account"
-                : "Sign in to your workspace"}
+              Sign in to your workspace
             </h2>
             <p>
-              {isSignup
-                ? "Set up your educator account to begin."
-                : "Access your learner insights and support queue."}
+              Access your learner insights and support queue.
             </p>
           </div>
 
@@ -182,20 +158,6 @@ export default function LoginForm({ mode = "login" }) {
           )}
 
           <form onSubmit={handleSubmit} className="login-form-element">
-            {isSignup && (
-              <>
-                <label htmlFor="fullName">Full name</label>
-                <div className="input-wrap">
-                  <input
-                    id="fullName"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    autoComplete="name"
-                    required
-                  />
-                </div>
-              </>
-            )}
             <label htmlFor="email">Work email</label>
             <div className="input-wrap">
               <span className="input-icon">@</span>
@@ -265,32 +227,21 @@ export default function LoginForm({ mode = "login" }) {
               disabled={isLoading}
             >
               <span>
-                {isLoading
-                  ? "Please wait..."
-                  : isSignup
-                    ? "Create account"
-                    : "Sign in"}
+                {isLoading ? "Please wait..." : "Sign in"}
               </span>
               <span>{"->"}</span>
             </button>
           </form>
 
-          {!isSignup && (
-            <>
-              <div className="auth-divider">
-                <span>or</span>
-              </div>
-              <GoogleSignIn />
-            </>
-          )}
+          <>
+            <div className="auth-divider">
+              <span>or</span>
+            </div>
+            <GoogleSignIn />
+          </>
 
           {/* Credentials helper pill */}
-          <p className="form-note">
-            {isSignup ? "Already have an account? " : "New to StudyShield? "}
-            <a href={isSignup ? "/login" : "/signup"}>
-              {isSignup ? "Sign in" : "Create an account"}
-            </a>
-          </p>
+          <p className="form-note">Access is limited to approved company accounts.</p>
           <p className="secure-note">
             <span className="shield-icon">+</span> Your workspace is protected
             with enterprise-grade security.

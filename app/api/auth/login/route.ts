@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyPassword } from '@/lib/auth/password';
 import { createSessionToken, setSessionCookie } from '@/lib/auth/session';
+import { getAuthRuntimeConfig, isAllowedEmail } from '@/lib/auth/runtime-config';
 
 export async function POST(request: Request) {
   try {
@@ -10,6 +11,9 @@ export async function POST(request: Request) {
     const password = typeof body.password === 'string' ? body.password : '';
     if (!/^\S+@\S+\.\S+$/.test(email) || !password) {
       return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
+    }
+    if (!isAllowedEmail(email, getAuthRuntimeConfig())) {
+      return NextResponse.json({ error: 'This account is not approved for StudyShield.' }, { status: 403 });
     }
     const user = await prisma.users.findUnique({ where: { email } });
     if (!user || !user.is_active || !(await verifyPassword(password, user.password_hash))) return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });

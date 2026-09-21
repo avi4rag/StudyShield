@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import { randomUUID } from "node:crypto";
 import { hashPassword } from "@/lib/auth/password";
 import prisma from "@/lib/prisma";
+import { getAuthRuntimeConfig, isAllowedEmail } from "@/lib/auth/runtime-config";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   providers: [Google],
@@ -16,6 +17,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   callbacks: {
     async signIn({ user }) {
       if (!user.email) return false;
+      const config = getAuthRuntimeConfig();
+      if (!isAllowedEmail(user.email, config)) return false;
 
       await prisma.users.upsert({
         where: { email: user.email.toLowerCase() },
