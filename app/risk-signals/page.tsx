@@ -116,7 +116,7 @@ export default function RiskSignalsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
         <Navbar activeTab="Risk Signals" onTabChange={handleTabChange} onLogout={logout} />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="w-full px-4 sm:px-6 lg:px-8 2xl:px-12 py-8">
           <header className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-700">

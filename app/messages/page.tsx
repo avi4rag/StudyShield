@@ -277,7 +277,7 @@ export default function MessagesPage() {
         />
 
         {/* Main Container */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 2xl:px-12 py-6 sm:py-8 space-y-6">
           
           {/* 1. Header with dynamic summary cards & + New Message */}
           <MessagesHeader
@@ -357,7 +357,7 @@ export default function MessagesPage() {
 
         {/* Footer */}
         <footer className="mt-12 border-t border-slate-200 bg-white py-6">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <div className="w-full px-4 sm:px-6 lg:px-8 2xl:px-12 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 rounded-md bg-emerald-500 flex items-center justify-center text-white font-bold text-[10px]">
                 S

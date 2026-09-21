@@ -73,8 +73,8 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 2xl:px-12">
+        <div className="flex items-center justify-between h-20 gap-5">
           
           {/* Left: StudyShield Logo & Brand */}
           <div className="flex items-center shrink-0 sm:min-w-[190px] lg:min-w-[220px]">
@@ -82,14 +82,14 @@ export default function Navbar({
               onClick={() => handleNavClick('Overview', '/dashboard')} 
               className="flex items-center gap-2.5 cursor-pointer group select-none"
             >
-              <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center shadow-sm shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-200">
-                <span className="text-white font-bold text-lg tracking-tight font-sans">S</span>
+              <div className="w-11 h-11 rounded-xl bg-emerald-500 flex items-center justify-center shadow-sm shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-200">
+                <span className="text-white font-bold text-xl tracking-tight font-sans">S</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-lg text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                <span className="font-bold text-xl sm:text-2xl text-slate-900 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
                   StudyShield
                 </span>
-                <span className="text-[10px] font-semibold text-emerald-600 tracking-wider uppercase mt-0.5 hidden sm:inline-block">
+                <span className="text-[11px] font-semibold text-emerald-600 tracking-wider uppercase mt-1 hidden sm:inline-block">
                   Retention Intelligence
                 </span>
               </div>
@@ -107,7 +107,7 @@ export default function Navbar({
                   onMouseEnter={() => {
                     if (item.href) router.prefetch(item.href);
                   }}
-                  className={`px-3 lg:px-3.5 py-1.5 rounded-lg text-xs lg:text-sm font-medium transition-all duration-150 relative whitespace-nowrap ${
+                  className={`px-3.5 lg:px-4 py-2 rounded-lg text-sm lg:text-base font-medium transition-all duration-150 relative whitespace-nowrap ${
                     isActive
                       ? 'text-emerald-700 bg-emerald-50/90 font-semibold'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'

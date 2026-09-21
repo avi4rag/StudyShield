@@ -17,7 +17,7 @@ export default function EarlyWarningSignals({ onSelectSignal, signals = EARLY_WA
         return <Clock className="w-5 h-5 text-rose-600" />;
       case 'HelpCircle':
         return <HelpCircle className="w-5 h-5 text-amber-600" />;
-      case 'LogIn':
+      case 'LogIn':   
         return <LogIn className="w-5 h-5 text-slate-700" />;
       default:
         return <AlertTriangle className="w-5 h-5 text-amber-600" />;
@@ -107,10 +107,10 @@ export default function EarlyWarningSignals({ onSelectSignal, signals = EARLY_WA
               </div>
 
               {/* Bottom Action */}
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700 group-hover:text-emerald-800">
+              {/* <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700 group-hover:text-emerald-800">
                 <span>Review flagged students</span>
                 <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </div>
+              </div> */}
             </div>
           );
         })}
