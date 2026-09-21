@@ -123,6 +123,13 @@ export default function DashboardPage() {
     });
   };
 
+  const showActivityFeed = () => {
+    setActiveTab("Overview");
+    requestAnimationFrame(() => {
+      document.getElementById("activity-feed")?.scrollIntoView({ behavior: "smooth" });
+    });
+  };
+
   const handleNudgeSent = async (studentId, message) => {
     const student = students.find((s) => s.id === studentId);
     try {
@@ -210,6 +217,8 @@ export default function DashboardPage() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onLogout={logout}
+          activities={activities}
+          onViewAllActivity={showActivityFeed}
         />
 
         {/* Welcome Header */}
@@ -349,9 +358,10 @@ export default function DashboardPage() {
                   />
 
                   {/* Recent Activity Feed */}
-                  <RecentActivity
+                  <div id="activity-feed" className="scroll-mt-24">
+                    <RecentActivity
                     onViewAllActivity={() =>
-                      showToast("Displaying real-time event feed for cohort.")
+                      showActivityFeed()
                     }
                     onSelectStudentActivity={(item) => {
                       const match = students.find(
@@ -360,7 +370,8 @@ export default function DashboardPage() {
                       if (match) setSelectedStudentForDetail(match);
                     }}
                     activities={activities}
-                  />
+                    />
+                  </div>
                 </div>
               </div>
 

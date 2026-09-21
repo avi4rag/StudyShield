@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   ShieldAlert, 
   Bell, 
@@ -27,13 +27,33 @@ export default function Navbar({
   searchQuery = '', 
   onSearchChange = (_query) => {},
   onLogout = () => {},
-  unreadNotifications = 3
+  activities = [],
+  onViewAllActivity = undefined,
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationsRead, setNotificationsRead] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const auth = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    setNotificationsRead(sessionStorage.getItem('studyshield_notifications_read') === 'true');
+  }, []);
+
+  const unreadNotifications = notificationsRead ? 0 : activities.length;
+
+  const markNotificationsRead = () => {
+    sessionStorage.setItem('studyshield_notifications_read', 'true');
+    setNotificationsRead(true);
+    setShowNotifications(false);
+  };
+
+  const viewActivity = () => {
+    setShowNotifications(false);
+    if (onViewAllActivity) onViewAllActivity();
+    else router.push('/dashboard#activity-feed');
+  };
 
   React.useEffect(() => {
     // Prefetch main routes so tab navigation is instant
@@ -147,8 +167,8 @@ export default function Navbar({
                         {unreadNotifications} new
                       </span>
                     </div>
-                    <button 
-                      onClick={() => setShowNotifications(false)}
+                    <button
+                      onClick={markNotificationsRead}
                       className="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
                     >
                       Mark read
@@ -156,45 +176,31 @@ export default function Navbar({
                   </div>
                   
                   <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                    <div className="p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <AlertCircle className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-900">Rahul Sharma transitioned to High Risk</p>
-                        <p className="text-xs text-slate-500 mt-0.5">12 consecutive days of inactivity detected</p>
-                        <span className="text-[10px] text-slate-400 mt-1 block">8 mins ago</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <AlertCircle className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-900">Priya Mehta missed Thermodynamics Quiz</p>
-                        <p className="text-xs text-slate-500 mt-0.5">Recommended action: Review student</p>
-                        <span className="text-[10px] text-slate-400 mt-1 block">24 mins ago</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3">
-                      <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                        <CheckCircle2 className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-900">Weekly Retention Model Synced</p>
-                        <p className="text-xs text-slate-500 mt-0.5">248 students analyzed with formula R(t)</p>
-                        <span className="text-[10px] text-slate-400 mt-1 block">2 hours ago</span>
-                      </div>
-                    </div>
+                    {activities.length > 0 ? activities.map((activity) => (
+                      <button
+                        key={activity.id}
+                        type="button"
+                        onClick={viewActivity}
+                        className="w-full p-3.5 hover:bg-slate-50 transition-colors flex items-start gap-3 text-left"
+                      >
+                        <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                          <AlertCircle className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-900">{activity.student} {activity.action}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{activity.details}</p>
+                          <span className="text-[10px] text-slate-400 mt-1 block">{activity.time}</span>
+                        </div>
+                      </button>
+                    )) : (
+                      <p className="px-4 py-6 text-center text-xs text-slate-500">No recent activity.</p>
+                    )}
                   </div>
 
                   <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/60 text-center">
                     <button 
                       onClick={() => {
-                        setShowNotifications(false);
-                        handleNavClick('Activity', '/dashboard');
+                        viewActivity();
                       }}
                       className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
                     >

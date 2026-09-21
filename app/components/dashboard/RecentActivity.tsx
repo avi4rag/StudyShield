@@ -1,27 +1,31 @@
 "use client";
 
-import React from 'react';
-import { 
-  AlertTriangle, 
-  FileX, 
-  TrendingDown, 
-  FileText, 
-  Clock, 
-  ChevronRight, 
-  Activity 
-} from 'lucide-react';
-import { RECENT_ACTIVITY_FEED } from '@/data/dashboardMetrics';
+import React from "react";
+import {
+  AlertTriangle,
+  FileX,
+  TrendingDown,
+  FileText,
+  Clock,
+  ChevronRight,
+  Activity,
+} from "lucide-react";
+import { RECENT_ACTIVITY_FEED } from "@/data/dashboardMetrics";
 
-export default function RecentActivity({ onViewAllActivity, onSelectStudentActivity, activities = RECENT_ACTIVITY_FEED }) {
+export default function RecentActivity({
+  onViewAllActivity,
+  onSelectStudentActivity,
+  activities = RECENT_ACTIVITY_FEED,
+}) {
   const getIcon = (type) => {
     switch (type) {
-      case 'risk_change':
+      case "risk_change":
         return <AlertTriangle className="w-4 h-4 text-rose-600" />;
-      case 'missed_quiz':
+      case "missed_quiz":
         return <FileX className="w-4 h-4 text-amber-600" />;
-      case 'batch_trend':
+      case "batch_trend":
         return <TrendingDown className="w-4 h-4 text-rose-600" />;
-      case 'report':
+      case "report":
         return <FileText className="w-4 h-4 text-emerald-600" />;
       default:
         return <Activity className="w-4 h-4 text-slate-500" />;
@@ -30,16 +34,16 @@ export default function RecentActivity({ onViewAllActivity, onSelectStudentActiv
 
   const getIconBg = (type) => {
     switch (type) {
-      case 'risk_change':
-        return 'bg-rose-50 border-rose-100';
-      case 'missed_quiz':
-        return 'bg-amber-50 border-amber-100';
-      case 'batch_trend':
-        return 'bg-rose-50 border-rose-100';
-      case 'report':
-        return 'bg-emerald-50 border-emerald-100';
+      case "risk_change":
+        return "bg-rose-50 border-rose-100";
+      case "missed_quiz":
+        return "bg-amber-50 border-amber-100";
+      case "batch_trend":
+        return "bg-rose-50 border-rose-100";
+      case "report":
+        return "bg-emerald-50 border-emerald-100";
       default:
-        return 'bg-slate-50 border-slate-200';
+        return "bg-slate-50 border-slate-200";
     }
   };
 
@@ -71,17 +75,24 @@ export default function RecentActivity({ onViewAllActivity, onSelectStudentActiv
           {activities.map((item) => (
             <div
               key={item.id}
-              onClick={() => onSelectStudentActivity && onSelectStudentActivity(item)}
+              onClick={() =>
+                onSelectStudentActivity && onSelectStudentActivity(item)
+              }
               className="py-3 first:pt-0 last:pb-0 hover:bg-slate-50/70 p-2 rounded-xl transition-colors cursor-pointer group"
             >
               <div className="flex items-start gap-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border mt-0.5 ${getIconBg(item.type)}`}>
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border mt-0.5 ${getIconBg(item.type)}`}
+                >
                   {getIcon(item.type)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-semibold text-slate-900 truncate group-hover:text-emerald-700 transition-colors">
-                      <strong className="text-slate-900 font-bold">{item.student}</strong> {item.action}
+                      <strong className="text-slate-900 font-bold">
+                        {item.student}
+                      </strong>{" "}
+                      {item.action}
                     </p>
                     <span className="text-[10px] text-slate-400 shrink-0 font-medium whitespace-nowrap">
                       {item.time}
