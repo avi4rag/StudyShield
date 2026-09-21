@@ -143,9 +143,15 @@ JWT_SECRET="a-long-random-secret-for-the-legacy-session-flow"
 AUTH_SECRET="a-long-random-secret-for-authjs"
 AUTH_GOOGLE_ID="your-google-client-id"
 AUTH_GOOGLE_SECRET="your-google-client-secret"
+AUTH_ALLOWED_EMAILS=""
+AUTH_ALLOWED_EMAIL_DOMAINS="unacademy.com"
 ```
 
 `DATABASE_URL` is used by the runtime database adapter. `DIRECT_URL` is used by Prisma configuration and migrations. Keep both values private.
+
+`AUTH_ALLOWED_EMAILS` accepts a comma-separated list of approved addresses. `AUTH_ALLOWED_EMAIL_DOMAINS` accepts a comma-separated list of approved company domains. At least one allowlist must be configured. Exact addresses take priority for organizations that do not want to allow every user in a domain.
+
+Public signup is disabled. The `/signup` page redirects to `/login`, and direct requests to `POST /api/auth/signup` return `403 Forbidden`. Password login and Google OAuth both enforce the same allowlist.
 
 ### Prepare the database
 
@@ -162,6 +168,18 @@ npx prisma db seed
 ```
 
 The seed script is idempotent for its development records and creates batches, quizzes, educators, students, attempts, and activity data.
+
+The seed also creates five development-only educator accounts. Passwords are hashed before storage and the accounts are safe to recreate with the seed command:
+
+| Email | Password |
+|---|---|
+| `test.educator01@unacademy.com` | `StudyShield!Test01` |
+| `test.educator02@unacademy.com` | `StudyShield!Test02` |
+| `test.educator03@unacademy.com` | `StudyShield!Test03` |
+| `test.educator04@unacademy.com` | `StudyShield!Test04` |
+| `test.educator05@unacademy.com` | `StudyShield!Test05` |
+
+These credentials are for local or test environments only. Change or remove them before using a shared or production database.
 
 ### Run locally
 
