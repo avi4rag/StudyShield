@@ -54,7 +54,6 @@ export default function StudentsPage() {
   const handleTabChange = (tab) => {
     if (
       tab === "Overview" ||
-      tab === "Activity" ||
       tab === "Reports"
     ) {
       router.push("/dashboard");
