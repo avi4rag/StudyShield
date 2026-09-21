@@ -8,6 +8,7 @@
     "dev:webpack": "next dev",
     "build": "next build",
     "start": "next start",
+    "db:seed": "prisma db seed",
     "test": "tsx --test tests/**/*.test.ts"
   },
   "dependencies": {

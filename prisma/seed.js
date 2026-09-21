@@ -228,7 +228,7 @@ async function main() {
 
   console.log("Seed complete:");
   console.log("- 15 test batches");
-  console.log("- 4 test educators");
+  console.log(`- ${TEST_EDUCATORS.length} approved test login accounts`);
   console.log("- 200 test students (120 healthy, 42 medium risk, 38 high risk)");
   console.log("- 30 test quizzes");
   console.log("- 200 quiz attempts and login activities");
