@@ -1,17 +1,15 @@
 "use client";
 
-import React from 'react';
-import { UserPlus, ShieldAlert, FileText, Send, Zap, ChevronRight } from 'lucide-react';
+import React from "react";
+import { ShieldAlert, FileText, Send, Zap, ChevronRight } from "lucide-react";
 
-export default function QuickActions({ 
-  onAddStudent, 
-  onViewAtRisk, 
-  onGenerateReport, 
-  onSendReminder 
+export default function QuickActions({
+  onViewAtRisk,
+  onGenerateReport,
+  onSendReminder,
 }) {
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/90 shadow-xs">
-      
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -31,28 +29,6 @@ export default function QuickActions({
 
       {/* Buttons Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        
-        {/* + Add Student */}
-        <button
-          onClick={onAddStudent}
-          className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/90 hover:border-emerald-300 hover:bg-emerald-50/40 text-left transition-all duration-150 group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <UserPlus className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                + Add Student
-              </p>
-              <p className="text-[11px] text-slate-500">
-                Enroll into retention monitor
-              </p>
-            </div>
-          </div>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
-        </button>
-
         {/* View At-Risk Students */}
         <button
           onClick={onViewAtRisk}
@@ -115,9 +91,7 @@ export default function QuickActions({
           </div>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
         </button>
-
       </div>
-
     </div>
   );
 }
