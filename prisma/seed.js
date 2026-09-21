@@ -1,4 +1,5 @@
 import "dotenv/config";
+import bcrypt from "bcryptjs";
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
@@ -24,6 +25,14 @@ const STUDENT_COUNT = 200;
 const HEALTHY_COUNT = 120; // 60%
 const MEDIUM_COUNT = 42; // 21%; the remaining 38 (19%) are high risk
 
+const TEST_EDUCATORS = [
+  ["Test Educator 01", "test.educator01@unacademy.com", "StudyShield!Test01"],
+  ["Test Educator 02", "test.educator02@unacademy.com", "StudyShield!Test02"],
+  ["Test Educator 03", "test.educator03@unacademy.com", "StudyShield!Test03"],
+  ["Test Educator 04", "test.educator04@unacademy.com", "StudyShield!Test04"],
+  ["Test Educator 05", "test.educator05@unacademy.com", "StudyShield!Test05"],
+];
+
 async function getOrCreateBatch(batchName) {
   const rows = await prisma.$queryRaw`
     INSERT INTO batches (batch_name)
@@ -46,6 +55,20 @@ async function getOrCreateEducator(fullName, email) {
   return rows[0].educator_id;
 }
 
+async function getOrCreateTestUser(fullName, email, password) {
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.$executeRaw`
+    INSERT INTO users (email, password_hash, full_name, role, is_active)
+    VALUES (${email}, ${passwordHash}, ${fullName}, 'EDUCATOR', true)
+    ON CONFLICT (email)
+    DO UPDATE SET
+      password_hash = EXCLUDED.password_hash,
+      full_name = EXCLUDED.full_name,
+      role = 'EDUCATOR',
+      is_active = true
+  `;
+}
+
 async function getOrCreateQuiz(batchId, title, dueAt) {
   const existing = await prisma.$queryRaw`
     SELECT quiz_id
@@ -65,6 +88,10 @@ async function getOrCreateQuiz(batchId, title, dueAt) {
 }
 
 async function main() {
+  for (const [fullName, email, password] of TEST_EDUCATORS) {
+    await getOrCreateTestUser(fullName, email, password);
+  }
+
   const batchIds = [];
   for (let index = 1; index <= 15; index += 1) {
     batchIds.push(await getOrCreateBatch(`Test Batch ${String(index).padStart(2, "0")} - 2026`));
