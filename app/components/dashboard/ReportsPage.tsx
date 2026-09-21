@@ -112,8 +112,8 @@ export default function ReportsPage({
       {/* Sub-header Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Good afternoon</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Comprehensive analytics, cohort trajectories, and engagement metrics.</p>
+          <h2 className="text-xl font-bold text-slate-900">Comprehensive analytics, cohort trajectories, and engagement metrics.</h2>
+          {/* <p className="text-xs text-slate-500 mt-0.5">Comprehensive analytics, cohort trajectories, and engagement metrics.</p> */}
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
