@@ -12,7 +12,7 @@ Educators can:
 - Review cohort-wide student counts and risk distribution.
 - Search and filter students by name, batch, and risk category.
 - Inspect student activity, quiz attempts, scores, inactivity, and risk signals.
-- Add students to batches.
+- Monitor student records supplied by the connected data source.
 - Send and review educator nudges and outreach messages.
 - View reports, early-warning signals, recent activity, and engagement trends.
 
@@ -68,11 +68,11 @@ Server routes determine the authenticated user from a verified Auth.js session o
 
 The student API remains protected:
 
-| Request state | Response |
-|---|---|
-| No valid session | `401 Unauthorized` |
-| Valid session without educator/admin access | `403 Forbidden` |
-| Active educator or admin | `200 OK` with permitted data |
+| Request state                               | Response                     |
+| ------------------------------------------- | ---------------------------- |
+| No valid session                            | `401 Unauthorized`           |
+| Valid session without educator/admin access | `403 Forbidden`              |
+| Active educator or admin                    | `200 OK` with permitted data |
 
 The primary student endpoint is `GET /api/students`. It reads real database records and calculates the response fields used by the dashboard. Authentication failures are not converted into empty arrays.
 
@@ -88,30 +88,30 @@ Q = quiz completion rate from 0 to 100
 
 Risk categories in the API are:
 
-| Category | Score |
-|---|---:|
-| Healthy | 0-39 |
-| Medium | 40-69 |
-| High | 70-100 |
+| Category |  Score |
+| -------- | -----: |
+| Healthy  |   0-39 |
+| Medium   |  40-69 |
+| High     | 70-100 |
 
 The dashboard also reports quiz completion, average score, missed deadlines, last active time, recommended action, and generated warning signals.
 
 ## Technology
 
-| Area | Technology |
-|---|---|
-| Framework | Next.js 16.3 with App Router |
-| Language | TypeScript and JavaScript data/services |
-| UI | React 19 |
-| Styling | Tailwind CSS 4 and project CSS variables |
-| Authentication | Auth.js / `next-auth` 5.0.0-beta.32 |
-| OAuth provider | Google |
-| Database | PostgreSQL |
-| ORM | Prisma 7 |
-| Database adapter | Neon serverless adapter |
-| Icons | Lucide React |
-| Password hashing | bcryptjs |
-| Legacy session signing | jose |
+| Area                   | Technology                               |
+| ---------------------- | ---------------------------------------- |
+| Framework              | Next.js 16.3 with App Router             |
+| Language               | TypeScript and JavaScript data/services  |
+| UI                     | React 19                                 |
+| Styling                | Tailwind CSS 4 and project CSS variables |
+| Authentication         | Auth.js / `next-auth` 5.0.0-beta.32      |
+| OAuth provider         | Google                                   |
+| Database               | PostgreSQL                               |
+| ORM                    | Prisma 7                                 |
+| Database adapter       | Neon serverless adapter                  |
+| Icons                  | Lucide React                             |
+| Password hashing       | bcryptjs                                 |
+| Legacy session signing | jose                                     |
 
 ## Getting Started
 
@@ -171,8 +171,8 @@ The seed script is idempotent for its development records and creates batches, q
 
 The seed also creates five development-only educator accounts. Passwords are hashed before storage and the accounts are safe to recreate with the seed command:
 
-| Email | Password |
-|---|---|
+| Email                           | Password             |
+| ------------------------------- | -------------------- |
 | `test.educator01@unacademy.com` | `StudyShield!Test01` |
 | `test.educator02@unacademy.com` | `StudyShield!Test02` |
 | `test.educator03@unacademy.com` | `StudyShield!Test03` |
@@ -220,7 +220,7 @@ Authentication routes:
 
 Protected application routes include:
 
-- `GET|POST /api/students`
+- `GET /api/students`
 - `GET /api/students/[id]`
 - `GET /api/dashboard/activity`
 - `GET /api/dashboard/signals`
@@ -301,7 +301,7 @@ The session is valid, but the database user is not an active `EDUCATOR` or `ADMI
 
 ### The dashboard shows no students
 
-Check the browser network response first. A successful `200` with an empty array means there are no student records available to display. A `401`, `403`, or `5xx` response should appear as an error state and should be investigated rather than treated as an empty cohort.
+Check the browser network response first. A successful `200` with an empty array means there are no student records available to display. Student records are supplied by the connected data source; manual creation is intentionally not exposed in the portal. A `401`, `403`, or `5xx` response should appear as an error state and should be investigated rather than treated as an empty cohort.
 
 ### Hydration warning mentions browser-extension attributes
 

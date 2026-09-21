@@ -6,13 +6,17 @@ import StudentsNeedingAttention from "@/components/dashboard/StudentsNeedingAtte
 import dynamic from "next/dynamic";
 import { cachedFetch, invalidateCache } from "@/lib/cache";
 
-const StudentDetailDrawer = dynamic(() => import("@/components/modals/StudentDetailDrawer"), { ssr: false });
-const NudgeModal = dynamic(() => import("@/components/modals/NudgeModal"), { ssr: false });
-const AddStudentModal = dynamic(() => import("@/components/modals/AddStudentModal"), { ssr: false });
+const StudentDetailDrawer = dynamic(
+  () => import("@/components/modals/StudentDetailDrawer"),
+  { ssr: false },
+);
+const NudgeModal = dynamic(() => import("@/components/modals/NudgeModal"), {
+  ssr: false,
+});
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/components/auth/AuthContext";
-import { CheckCircle2, UserPlus, Users, Sparkles } from "lucide-react";
+import { CheckCircle2, Users, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function StudentsPage() {
@@ -25,15 +29,14 @@ export default function StudentsPage() {
   const [selectedStudentForDetail, setSelectedStudentForDetail] =
     useState(null);
   const [selectedStudentForNudge, setSelectedStudentForNudge] = useState(null);
-  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
   const fetchStudents = useCallback(async (force = false) => {
     if (force) {
-      invalidateCache('/api/students');
+      invalidateCache("/api/students");
     }
     try {
-      const data = await cachedFetch('/api/students');
+      const data = await cachedFetch("/api/students");
       if (data) setStudents(data);
     } catch (err) {
       console.error("Students page fetch error:", err);
@@ -52,10 +55,7 @@ export default function StudentsPage() {
   };
 
   const handleTabChange = (tab) => {
-    if (
-      tab === "Overview" ||
-      tab === "Reports"
-    ) {
+    if (tab === "Overview" || tab === "Reports") {
       router.push("/dashboard");
     } else if (tab === "Risk Signals") {
       router.push("/risk-signals");
@@ -78,41 +78,13 @@ export default function StudentsPage() {
           requiresResponse: true,
         }),
       });
-      invalidateCache('/api/nudges');
-      invalidateCache('/api/students');
+      invalidateCache("/api/nudges");
+      invalidateCache("/api/students");
     } catch (err) {
       console.error("Failed to persist nudge:", err);
     }
     showToast(
       `Nudge sent successfully to ${student ? student.name : "student"}.`,
-    );
-  };
-
-  const handleAddStudent = async (newStudentLocal) => {
-    try {
-      const res = await fetch("/api/students", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: newStudentLocal.name,
-          email: newStudentLocal.email,
-          batchName: newStudentLocal.batch,
-          notes: newStudentLocal.notes ?? null,
-        }),
-      });
-      invalidateCache('/api/students');
-      invalidateCache('/api/dashboard');
-      if (res.ok) {
-        const saved = await res.json();
-        setStudents((prev) => [saved, ...prev]);
-      } else {
-        setStudents((prev) => [newStudentLocal, ...prev]);
-      }
-    } catch {
-      setStudents((prev) => [newStudentLocal, ...prev]);
-    }
-    showToast(
-      `Enrolled ${newStudentLocal.name} into StudyShield retention monitor.`,
     );
   };
 
@@ -159,14 +131,6 @@ export default function StudentsPage() {
                 scores, and academic momentum.
               </p>
             </div>
-
-            <button
-              onClick={() => setIsAddStudentOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all self-start sm:self-auto"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>+ Add Student</span>
-            </button>
           </div>
         </div>
 
@@ -223,12 +187,6 @@ export default function StudentsPage() {
           onClose={() => setSelectedStudentForNudge(null)}
           student={selectedStudentForNudge}
           onSendNudge={handleNudgeSent}
-        />
-
-        <AddStudentModal
-          isOpen={isAddStudentOpen}
-          onClose={() => setIsAddStudentOpen(false)}
-          onAddStudent={handleAddStudent}
         />
       </div>
     </ProtectedRoute>
