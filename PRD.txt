@@ -38,220 +38,278 @@ The goal of this project is to automatically identify such students and help edu
 
 The main goal is to build a simple prototype that can:
 
-1. Store student information.
-2. Track basic student activity.
-3. Calculate a student risk score.
-4. Show high-risk students to the educator.
-5. Allow the educator to send a simple nudge.
-6. Allow the student to complete a quiz and improve their status.
+# StudyShield Product Requirements Document
 
----
+## 1. Product Overview
 
-## 4. Simple Risk Model
+StudyShield is an educator-focused early-warning and student-retention platform. It combines learner activity and quiz performance into explainable risk signals so educators can identify students who may be disengaging and take action earlier.
 
-Each student receives a Risk Score R between 0 and 100.
+The current release is a working prototype focused on the educator monitoring and outreach workflow. It includes a protected dashboard, database-backed student data, risk calculation, filtering, student details, reports, warning signals, and educator nudges.
 
-### 4.1 Scoring Formula
+## 2. Problem Statement
 
-R(t) = min(100, wq × (100 − Q(t)) + wl × L(t))
+In a large online class, educators cannot manually inspect every student's login activity, quiz completion, missed deadlines, and recent engagement. Students may gradually disengage without directly asking for help.
 
-Where:
+The problem is therefore both visibility and response:
 
-- Q(t): Quiz completion rate from 0 to 100.
-- L(t): Inactivity score.
-- wq = 0.60: Weight for quiz completion.
-- wl = 0.40: Weight for inactivity.
+- Relevant learning data is spread across different records.
+- Educators do not have a clear priority list.
+- Warning signs are easy to notice too late.
+- A detected problem is not automatically connected to a next action.
 
-The inactivity score is:
+StudyShield addresses this by turning activity data into a prioritized intervention queue.
 
-L(t) = min(100, inactive_days × 25)
+## 3. Product Goals
 
-This means that students who complete fewer quizzes or remain inactive for several days will have a higher risk score.
+### 3.1 Current goals
 
-### 4.2 Risk Levels
+The current prototype must:
 
-- HIGH RISK: R > 75
-- MEDIUM RISK: 45 ≤ R ≤ 75
-- LOW RISK: R < 45
+1. Authenticate educators securely.
+2. Store students, batches, quizzes, quiz attempts, activity, users, and nudges.
+3. Calculate an explainable risk score from quiz completion and login recency.
+4. Display cohort-level metrics and risk distribution.
+5. Allow educators to search, filter, and sort students.
+6. Show the evidence behind an individual student's score.
+7. Allow educators to send and review outreach nudges.
+8. Provide loading, empty, and error states for dashboard data.
 
----
+### 3.2 Success indicators
 
-## 5. Main Users
+- An educator can identify high-risk students without reviewing the entire cohort manually.
+- Each risk score includes understandable supporting signals.
+- An educator can move from a warning signal to a student review or nudge.
+- Protected APIs reject unauthenticated and unauthorized access.
 
-### 5.1 Educator
+## 4. Users and Roles
 
-The educator should be able to:
+### 4.1 Educator
 
-- View a list of students.
-- See each student's risk score.
-- Identify high-risk students.
-- Search for a student.
-- Filter students by risk level.
-- Send a nudge to a student.
+Educators are the primary users. They can:
 
-### 5.2 Student
+- Sign in with email/password or Google OAuth.
+- View cohort metrics and risk distribution.
+- Search students by name, email, or signal.
+- Filter by risk category and batch.
+- Sort by highest risk, longest inactivity, or lowest quiz completion.
+- Inspect student details, quiz activity, scores, deadlines, and signals.
+- Send, schedule, and review outreach nudges.
+- View reports, recent activity, engagement trends, and risk signals.
 
-The student should be able to:
+### 4.2 Administrator
 
-- View their current learning status.
-- See pending or missed quizzes.
-- Receive a nudge from the educator.
-- Complete a quiz.
-- See their status improve after completing activities.
+Administrators use the same protected educator workflows and may access permitted educator data.
 
----
+### 4.3 Student
 
-## 6. Main Features
+Student-facing authentication and route scaffolding exist in the current project. A complete student portal with pending quizzes, quiz completion, and rich nudge interactions is future scope.
 
-### 6.1 Educator Dashboard
+## 5. Risk Model
 
-The dashboard should show:
+Each student receives a risk score from 0 to 100. A higher score indicates greater risk and should be treated as a prompt for educator review, not as a final judgment about the student.
 
-- Total number of students.
-- Number of high-risk students.
-- Number of medium-risk students.
-- Number of low-risk students.
+### 5.1 Inputs
 
-It should also show a table containing:
+- `Q`: quiz completion rate from 0 to 100.
+- `inactive_days`: full days since the student's last login.
+- If there is no recorded login, inactivity is treated as 99 days for risk calculation.
 
-- Student name.
-- Email.
+### 5.2 Formula
+
+```text
+L = min(100, inactive_days x 25)
+R = round(min(100, 0.6 x (100 - Q) + 0.4 x L))
+```
+
+Quiz completion contributes 60 percent of the score and inactivity contributes 40 percent. The inactivity component reaches its maximum after four days.
+
+### 5.3 Risk categories
+
+- **Healthy:** 0-39
+- **Medium:** 40-69
+- **High:** 70-100
+
+The API also generates signals such as:
+
+- Three or more days inactive: medium inactivity signal.
+- Seven or more days inactive: high inactivity signal.
+- Quiz completion below 50 percent: quiz signal.
+- Low risk with zero inactive days: positive consistent-login signal.
+
+### 5.4 Example
+
+A student with 40 percent quiz completion and three inactive days receives:
+
+```text
+L = 3 x 25 = 75
+R = 0.6 x (100 - 40) + 0.4 x 75 = 66
+```
+
+The student is classified as Medium risk and should be monitored or contacted.
+
+## 6. Functional Requirements
+
+### 6.1 Authentication and authorization
+
+- The login page supports email/password login and Google OAuth through Auth.js.
+- Protected application routes require an authenticated session.
+- Student data APIs return `401 Unauthorized` when no valid session exists.
+- Student data APIs return `403 Forbidden` when the user lacks educator or administrator access.
+- Server-side authorization must use the verified session and must not trust a client-supplied user ID.
+- Passwords must be stored as hashes, never as plain text.
+
+### 6.2 Educator dashboard
+
+The dashboard must display:
+
+- Total students.
+- Students at risk.
+- High-risk students.
+- Healthy students.
+- Risk distribution.
+- Engagement trend and recent activity where data is available.
+- Early-warning signals with counts and recommended next steps.
+- A student attention table.
+
+The student table must display, where available:
+
+- Name and email.
 - Batch.
-- Risk score.
-- Risk level.
-- Quiz completion percentage.
-- Inactive days.
+- Risk score and category.
+- Quiz completion rate.
+- Inactive days and last active time.
+- Average score.
+- Missed deadlines.
+- Recommended action.
 
----
+### 6.3 Search, filtering, and sorting
 
-### 6.2 Student Search and Filters
+Educators must be able to:
 
-The educator should be able to:
-
-- Search by student name.
-- Search by email.
-- Filter by risk level.
+- Search by student name or email.
+- Search by generated signal text.
+- Filter by Healthy, Medium, High, or all students.
 - Filter by batch.
+- Sort by risk score descending.
+- Sort by inactivity descending.
+- Sort by quiz completion ascending.
 
----
+### 6.4 Student details
 
-### 6.3 Risk Score Calculation
+Selecting a student should expose the evidence used to prioritize them, including quiz attempts, completion rate, average score, missed deadlines, last login, notes, risk category, recommended action, and generated signals.
 
-The system should recalculate the student's risk score when important events happen.
+Persistent risk history is not currently stored in the database and is a future requirement.
 
-For the prototype, support these events:
+### 6.5 Outreach and nudges
 
-#### Student Login
+Educators must be able to:
 
-- Set inactive days to 0.
-- Recalculate the risk score.
+- Send a check-in, early-warning, quiz-reminder, study-reminder, encouragement, follow-up, or custom message.
+- Associate a nudge with a student and educator.
+- Require a student response.
+- Schedule a message for later delivery.
+- Review message status, response status, timestamps, and message content.
 
-#### Quiz Completed
+The current implementation persists nudges in the database. Automated delivery and student responses beyond the current data model are future enhancements.
 
-- Increase quiz completion rate.
-- Recalculate the risk score.
+### 6.6 Reports and signals
 
-#### Quiz Missed
+The application should provide dedicated views for:
 
-- Reduce quiz completion rate.
-- Recalculate the risk score.
+- Reports.
+- Risk signals.
+- Messages and outreach.
+- Students.
 
----
+These views should preserve the same authenticated educator context as the dashboard.
 
-### 6.4 Nudge System
+## 7. Data Model
 
-The educator should be able to send a simple message to a student.
+The PostgreSQL database, accessed through Prisma, contains the following main entities:
 
-Example:
+- `users`: identity, role, account status, and authentication information.
+- `educators`: educator profile and ownership of nudges.
+- `students`: learner profile, batch, last login, and notes.
+- `batches`: learner cohorts.
+- `quizzes`: quizzes assigned to batches.
+- `quiz_attempts`: student quiz status, score, and submission time.
+- `student_activities`: timestamped activity records and optional JSON details.
+- `nudges`: educator outreach, status, scheduling, and response fields.
 
-"Hi, you have missed some quizzes. Please complete them to get back on track."
+The current risk score is calculated at read time from student login and quiz-attempt data. A separate persisted risk-score history table is not currently part of the implementation.
 
-The student should be able to see the message in the Student Portal.
+## 8. System Architecture
 
-For the first version, a simple in-app notification is enough.
+```text
+Educator
+        |
+Next.js / React dashboard
+        |
+Protected API routes
+        |
+Authentication and authorization
+        |
+Prisma ORM + risk calculation
+        |
+PostgreSQL
+```
 
----
+The primary student endpoint reads database records, calculates quiz completion and inactivity, applies the risk formula, generates signals, and returns dashboard-ready data. The client dashboard consumes protected APIs and supports cached GET requests for the current browser tab.
 
-### 6.5 Student Portal
-
-The Student Portal should display:
-
-- Student name.
-- Current risk level or momentum status.
-- Pending quizzes.
-- Received nudges.
-- A button to complete a quiz.
-
-After a quiz is completed, the system should update the student's risk score.
-
----
-
-### 6.6 Simple Risk History
-
-The system should store previous risk scores so the educator can see whether the student's risk is:
-
-- Improving
-- Becoming worse
-- Remaining stable
-
-For the prototype, a simple chart showing recent risk scores is enough.
-
----
-
-## 7. Simple System Architecture
-
-The project will use:
-
-Frontend
-    ↓
-Next.js
-    ↓
-Server Actions / API Routes
-    ↓
-Risk Score Calculation
-    ↓
-PostgreSQL Database
-
-The PostgreSQL database will store:
-
-- Students
-- Batches
-- Quiz attempts
-- Risk scores
-- Risk history
-- Nudges
-
----
-
-## 8. Technology Stack
+## 9. Technology Stack
 
 ### Frontend
 
-- Next.js
-- React
-- Tailwind CSS
+- Next.js App Router.
+- React.
+- TypeScript and JavaScript services.
+- Tailwind CSS and project CSS variables.
+- Lucide React icons.
 
-### Backend
+### Backend and security
 
-- Next.js Server Actions or API Routes
+- Next.js API routes.
+- Auth.js / NextAuth with Google OAuth.
+- Legacy email/password session support.
+- `bcryptjs` password hashing.
+- Server-side role checks.
 
-### Database
+### Data
 
-- PostgreSQL
+- PostgreSQL.
+- Prisma ORM.
+- Neon serverless adapter.
 
----
+## 10. Non-Functional Requirements
 
-## 9. Basic Database Tables
+- Dashboard views should be responsive on desktop and mobile.
+- Loading, successful empty, and error states must be distinguishable.
+- API responses must not expose student data to unauthenticated users.
+- Risk calculations must be deterministic and explainable.
+- Secrets, database credentials, OAuth credentials, and tokens must not be committed.
+- The application should support local development with seeded development data.
 
-For the first version, the project can use these tables:
+## 11. Current Scope and Limitations
 
-### Students
+The current release is an educator monitoring and outreach prototype. It does not yet provide:
 
-Stores:
+- Persisted risk-history records and historical risk charts.
+- A complete student portal with live pending quizzes and quiz completion.
+- A machine-learning prediction model.
+- Fully automated intervention delivery.
+- Validated production thresholds based on historical retention outcomes.
 
-- Student ID
-- Name
-- Email
+The risk score is a prioritization aid. Educators should review the underlying signals and use professional judgment before taking action.
+
+## 12. Future Roadmap
+
+1. Persist risk scores and add trend history per student.
+2. Complete the student portal with quiz completion and visible nudges.
+3. Recalculate scores when login, quiz completion, and missed-quiz events occur.
+4. Add educator-approved automated or scheduled interventions.
+5. Validate thresholds against historical retention and engagement outcomes.
+6. Measure intervention effectiveness and student response rates.
+7. Add audit logs, privacy controls, production monitoring, and data-retention policies.
 - Batch
 - Current risk score
 - Inactive days
